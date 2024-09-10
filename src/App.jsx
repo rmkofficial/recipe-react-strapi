@@ -1,51 +1,18 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import RecipeList from "./components/RecipeList";
 import RecipeForm from "./components/RecipeForm";
 import RecipeDetail from "./components/RecipeDetail";
 import CategorySelector from "./components/CategorySelector";
+import RecipeList from "./components/RecipeList"; 
 
 function App() {
-  const [recipes, setRecipes] = useState([
-    {
-      id: 1,
-      name: "Spaghetti Carbonara",
-      cuisine: "Italy",
-      description: "A classic Italian pasta dish...",
-    },
-    {
-      id: 2,
-      name: "Chicken Curry",
-      cuisine: "India",
-      description: "A spicy and flavorful curry...",
-    },
-    {
-      id: 3,
-      name: "Beef Tacos",
-      cuisine: "Mexico",
-      description: "Delicious tacos with seasoned beef...",
-    },
-  ]);
+  const [selectedCuisine, setSelectedCuisine] = useState(""); // Seçilen mutfak kategorisi
+  const [searchTerm, setSearchTerm] = useState(""); // Arama terimi
 
-  const [selectedCuisine, setSelectedCuisine] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const addRecipe = (newRecipe) => {
-    setRecipes([...recipes, newRecipe]);
-  };
-
+  // Arama fonksiyonu
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
-
-  // Arama işlemi
-  const filteredRecipes = recipes.filter((recipe) => {
-    return (
-      (selectedCuisine ? recipe.cuisine === selectedCuisine : true) && // Mutfak filtresi
-      (recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        recipe.description.toLowerCase().includes(searchTerm.toLowerCase())) // Anahtar kelimeye göre arama
-    );
-  });
 
   return (
     <Router>
@@ -55,10 +22,13 @@ function App() {
             path="/"
             element={
               <>
+                {/* Mutfak Kategorisi Seçici */}
                 <CategorySelector
                   selectedCuisine={selectedCuisine}
                   setSelectedCuisine={setSelectedCuisine}
                 />
+
+                {/* Arama Çubuğu */}
                 <div className="mb-6 mx-auto w-72">
                   <input
                     type="text"
@@ -68,15 +38,21 @@ function App() {
                     className="w-full px-4 py-2 border rounded shadow focus:outline-none"
                   />
                 </div>
-                <RecipeForm addRecipe={addRecipe} />
-                <RecipeList recipes={filteredRecipes} />
+
+                {/* Tarif Ekleme Formu */}
+                <RecipeForm />
+
+                {/* Tarif Listeleme (API'den veri çeken component) */}
+                <RecipeList
+                  selectedCuisine={selectedCuisine}
+                  searchTerm={searchTerm}
+                />
               </>
             }
           />
-          <Route
-            path="/recipe/:name"
-            element={<RecipeDetail recipes={recipes} />}
-          />
+
+          {/* Tarif Detay Sayfası */}
+          <Route path="/recipe/:name" element={<RecipeDetail />} />
         </Routes>
       </div>
     </Router>
