@@ -1,12 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const generateSlug = (name) => {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "");
-};
+
+const defaultImage = "https://via.placeholder.com/150?text=No+Image";
 
 const RecipeList = ({ recipes }) => {
   return (
@@ -14,10 +10,18 @@ const RecipeList = ({ recipes }) => {
       <h1 className="text-2xl font-bold mb-4">Recipe List</h1>
       <ul className="space-y-4">
         {recipes.map((recipe) => (
-          <li key={recipe.id} className="border-b pb-4">
-            <Link to={`/recipe/${generateSlug(recipe.name)}`}>
+          <li key={recipe.id} className="border-b pb-4 flex items-center">
+            <img
+              src={recipe.image || defaultImage}
+              alt={recipe.name}
+              className="w-16 h-16 mr-4 rounded"
+            />
+            <Link
+              to={`/recipe/${recipe.name.toLowerCase().replace(/\s+/g, "-")}`}
+            >
               <h2 className="text-xl font-semibold">{recipe.name}</h2>
-              <p className="text-gray-500">{recipe.category}</p>
+              <p className="text-gray-500">{recipe.cuisine}</p>
+              <p className="text-gray-700">{recipe.description}</p>
             </Link>
           </li>
         ))}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Select from "react-select";
 import Flag from "react-world-flags";
 
-// Ülke ve bayrak verileri
+// Ülke ve mutfak verileri
 const countries = [
   { label: "Italy", code: "IT" },
   { label: "India", code: "IN" },
@@ -13,52 +13,74 @@ const countries = [
 
 const RecipeForm = ({ addRecipe }) => {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState(countries[0]); 
+  const [description, setDescription] = useState("");
+  const [cuisine, setCuisine] = useState(countries[0]); 
+  const [image, setImage] = useState(null); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newRecipe = { id: Date.now(), name, category: category.label };
+
+    const newRecipe = {
+      id: Date.now(),
+      name,
+      description,
+      cuisine: cuisine.label, 
+      image,
+    };
+
     addRecipe(newRecipe);
     setName("");
-    setCategory(countries[0]);
+    setDescription("");
+    setCuisine(countries[0]);
+    setImage(null);
   };
 
-  // Dropdown'da seçilen değeri güncelleyen fonksiyon
-  const handleCategoryChange = (selectedOption) => {
-    setCategory(selectedOption);
+  const handleCuisineChange = (selectedOption) => {
+    setCuisine(selectedOption);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   };
 
   // Bayrak ve ülke adıyla birlikte stilize edilmiş dropdown seçenekleri
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#FCF5E5" : "white",
+      backgroundColor: state.isFocused ? "#FCF5E5" : "white", 
       color: "black", 
       padding: 10,
-      cursor: "pointer", 
+      cursor: "pointer",
     }),
     control: (provided) => ({
       ...provided,
       backgroundColor: "white",
       borderColor: "#ccc",
       boxShadow: "none",
-      cursor: "pointer", 
       "&:hover": { borderColor: "#aaa" },
     }),
     menu: (provided) => ({
       ...provided,
-      backgroundColor: "rgba(255, 255, 255, 0.95)", 
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
       zIndex: 999,
     }),
     singleValue: (provided) => ({
       ...provided,
       display: "flex",
       alignItems: "center",
-      color: "black", 
+      color: "black",
     }),
   };
 
-  // Dropdown öğelerinde bayrak ve ülke adını birlikte gösterme
   const formatOptionLabel = ({ label, code }) => (
     <div className="flex items-center">
       <Flag code={code} className="mr-2 w-6 h-4" /> {label}
@@ -90,22 +112,57 @@ const RecipeForm = ({ addRecipe }) => {
         />
       </div>
 
-      {/* Ülke Kategorisi Dropdown */}
+      {/* Açıklama Alanı */}
       <div className="mb-4">
         <label
           className="block text-gray-700 text-sm font-bold mb-2"
-          htmlFor="category"
+          htmlFor="description"
         >
-          Select Category (Country)
+          Description
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      {/* Mutfak (Cuisine) Dropdown */}
+      <div className="mb-4">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="cuisine"
+        >
+          Select Cuisine
         </label>
         <Select
-          value={category}
-          onChange={handleCategoryChange}
+          value={cuisine}
+          onChange={handleCuisineChange}
           options={countries}
-          formatOptionLabel={formatOptionLabel}
+          formatOptionLabel={formatOptionLabel} 
           styles={customStyles}
           isSearchable
           className="w-full"
+        />
+      </div>
+
+      {/* Fotoğraf Yükleme Alanı */}
+      <div className="mb-4">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="image"
+        >
+          Upload Image
+        </label>
+        <input
+          type="file"
+          id="image"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
       </div>
 
